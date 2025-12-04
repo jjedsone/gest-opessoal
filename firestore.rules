@@ -2,10 +2,80 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Regra padrão: negar tudo por padrão (segurança máxima)
+    
+    // Regras para usuários - apenas o próprio usuário pode ler/escrever
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para perfis - apenas o próprio usuário pode ler/escrever
+    match /profiles/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para contas - usuário autenticado pode ler/escrever suas próprias contas
+    match /accounts/{accountId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para transações - usuário autenticado pode ler/escrever suas próprias transações
+    match /transactions/{transactionId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para metas - usuário autenticado pode ler/escrever suas próprias metas
+    match /goals/{goalId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para orçamentos - usuário autenticado pode ler/escrever seus próprios orçamentos
+    match /budgets/{budgetId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para regras de divisão (casais) - usuário autenticado pode ler/escrever
+    match /division_rules/{ruleId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para notificações - usuário autenticado pode ler/escrever suas próprias notificações
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para sugestões da IA - usuário autenticado pode ler/escrever suas próprias sugestões
+    match /ai_suggestions/{suggestionId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.user_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Regras para relacionamentos de casal - usuário autenticado pode ler/escrever
+    match /couple_relationships/{relationshipId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || 
+         resource.data.user1_id == request.auth.uid || 
+         resource.data.user2_id == request.auth.uid);
+      allow create: if request.auth != null;
+    }
+    
+    // Negar acesso a tudo mais por padrão
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
-
