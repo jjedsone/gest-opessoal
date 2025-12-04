@@ -19,7 +19,7 @@ function ProtectedRoute({ children }: { children: React.ReactElement }) {
 
 function App() {
   return (
-    <Router future={{ v7_relativeSplatPath: true }}>
+    <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <Routes>
         <Route path="/" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
