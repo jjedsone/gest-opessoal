@@ -1,6 +1,5 @@
 import { useEffect, useCallback } from 'react';
 import { aiSuggestionService } from '../services/aiSuggestionService';
-import { notificationService } from '../services/notificationService';
 
 /**
  * Hook para gerar sugestões da IA automaticamente

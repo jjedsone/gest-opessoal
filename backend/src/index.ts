@@ -22,7 +22,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        'https://get-opessoal.web.app',
+        'https://get-opessoal.firebaseapp.com',
+      ]
+    : true, // Em desenvolvimento, permite todas as origens
+  credentials: true,
+}));
 app.use(express.json());
 
 // Health check (sem verificação de banco)

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { accountService, Account } from '../services/accountService';
+import { Transaction } from '../services/transactionService';
 import './RegistrarDespesa.css';
 
 interface DespesaData {
@@ -100,14 +101,14 @@ function RegistrarDespesa({ onSuccess }: RegistrarDespesaProps) {
     try {
       const { transactionService } = await import('../services/transactionService');
       
-      const transactionData = {
+      const transactionData: Transaction = {
         account_id: accountId,
         tipo: tipoTransacao,
         categoria: formData.categoria,
         valor: parseFloat(formData.valor),
         data: formData.data,
         nota: formData.descricao,
-        conta_origem: formData.conta === 'conjunta' ? 'conjunta' : 'individual',
+        conta_origem: (formData.conta === 'conjunta' ? 'conjunta' : 'individual') as 'conjunta' | 'individual',
         descricao: formData.descricao,
       };
 

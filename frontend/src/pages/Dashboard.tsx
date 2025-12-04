@@ -163,7 +163,7 @@ function Dashboard() {
                     fill="#8884d8"
                     dataKey="valor"
                   >
-                    {categorySpending.map((entry, index) => (
+                    {categorySpending.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

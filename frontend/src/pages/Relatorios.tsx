@@ -87,7 +87,6 @@ function Relatorios() {
     setMonthlyReport(reports);
     
     if (reports.length > 0) {
-      const lastMonth = reports[reports.length - 1];
       const monthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
       setSelectedMonth(monthKey);
     }

@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { transactionService, Transaction } from '../services/transactionService';
-import { accountService, Account } from '../services/accountService';
 import RegistrarDespesa from '../components/RegistrarDespesa';
 import './Transacoes.css';
 
 function Transacoes() {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [filterTipo, setFilterTipo] = useState<'todos' | 'receita' | 'despesa'>('todos');
@@ -25,12 +23,8 @@ function Transacoes() {
 
   const loadData = async () => {
     try {
-      const [transactionsData, accountsData] = await Promise.all([
-        transactionService.getAll({ limit: 100 }),
-        accountService.getAll(),
-      ]);
+      const transactionsData = await transactionService.getAll({ limit: 100 });
       setTransactions(transactionsData.transactions || []);
-      setAccounts(accountsData.accounts || []);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
     } finally {

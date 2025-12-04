@@ -57,7 +57,7 @@ function Importacao() {
       Papa.parse(selectedFile, {
         header: true,
         skipEmptyLines: true,
-        complete: (results) => {
+        complete: (results: Papa.ParseResult<any>) => {
           const data = results.data as any[];
           const previewData = data.slice(0, 10).map(row => ({
             data: row.data || row.Data || '',
@@ -69,7 +69,7 @@ function Importacao() {
           }));
           setPreview(previewData);
         },
-        error: (error) => {
+        error: (error: Error) => {
           setErrors([`Erro ao ler arquivo: ${error.message}`]);
         },
       });
@@ -117,7 +117,7 @@ function Importacao() {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: async (results) => {
+      complete: async (results: Papa.ParseResult<any>) => {
         const allErrors: string[] = [];
         const transactions: any[] = [];
 
@@ -185,7 +185,7 @@ function Importacao() {
           setLoading(false);
         }
       },
-      error: (error) => {
+      error: (error: Error) => {
         setErrors([`Erro ao processar arquivo: ${error.message}`]);
         setLoading(false);
       },
