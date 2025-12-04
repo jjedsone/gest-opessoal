@@ -13,7 +13,7 @@ export function generateToken(payload: TokenPayload): string {
     throw new Error('JWT_SECRET não configurado');
   }
 
-  return jwt.sign(payload, jwtSecret, { expiresIn });
+  return jwt.sign(payload, jwtSecret, { expiresIn: expiresIn as string });
 }
 
 export function verifyToken(token: string): TokenPayload {

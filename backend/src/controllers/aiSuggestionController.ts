@@ -200,13 +200,13 @@ export async function acceptSuggestion(req: Request, res: Response) {
       return res.status(404).json({ error: 'Sugestão não encontrada' });
     }
 
-    const suggestion = suggestionResult.rows[0];
-    const acaoSugerida = typeof suggestion.acao_sugerida === 'string'
+    const suggestion = suggestionResult.rows[0] as any;
+    const acaoSugerida = typeof suggestion?.acao_sugerida === 'string'
       ? JSON.parse(suggestion.acao_sugerida)
-      : suggestion.acao_sugerida;
+      : suggestion?.acao_sugerida;
 
     // Executar ação baseada no tipo
-    if (suggestion.tipo === 'meta' && acaoSugerida.goal_id) {
+    if (suggestion?.tipo === 'meta' && acaoSugerida?.goal_id) {
       // Atualizar meta com valor sugerido
       await pool.query(
         `UPDATE goals 

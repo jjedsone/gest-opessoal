@@ -62,10 +62,12 @@ export async function getAccountBalance(req: Request, res: Response) {
       [userId]
     );
 
+    const balanceRow = result.rows[0] as { saldo_total?: string | number; total_receitas?: string | number; total_despesas?: string | number } | undefined;
+    
     res.json({
-      saldoTotal: parseFloat(result.rows[0].saldo_total || 0),
-      totalReceitas: parseFloat(result.rows[0].total_receitas || 0),
-      totalDespesas: parseFloat(result.rows[0].total_despesas || 0),
+      saldoTotal: parseFloat(String(balanceRow?.saldo_total || 0)),
+      totalReceitas: parseFloat(String(balanceRow?.total_receitas || 0)),
+      totalDespesas: parseFloat(String(balanceRow?.total_despesas || 0)),
       contas: accountsResult.rows,
     });
   } catch (error) {

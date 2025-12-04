@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-// Não precisa mais de dotenv para SQLite (mas mantém para outras variáveis)
 import dotenv from 'dotenv';
-dotenv.config();
 
 // Rotas
 import authRoutes from './routes/authRoutes';

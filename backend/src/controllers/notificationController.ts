@@ -92,7 +92,8 @@ export async function getUnreadCount(req: Request, res: Response) {
       [userId]
     );
 
-    res.json({ count: parseInt(result.rows[0].count) });
+    const countRow = result.rows[0] as { count: string | number } | undefined;
+    res.json({ count: parseInt(String(countRow?.count || 0)) });
   } catch (error) {
     console.error('Erro ao contar notificações:', error);
     res.status(500).json({ error: 'Erro ao contar notificações' });

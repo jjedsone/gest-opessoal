@@ -1,6 +1,3 @@
-import pool from '../config/database';
-import { hashPassword } from './password';
-
 import pool, { generateUUID } from '../config/database';
 import { hashPassword } from './password';
 
@@ -32,7 +29,12 @@ export async function createAdminUser() {
 
     // Buscar admin criado
     const adminResult = await pool.query('SELECT id, nome, username FROM users WHERE id = ?', [userId]);
-    const admin = adminResult.rows[0];
+    const admin = adminResult.rows[0] as { id: string; nome: string; username: string } | undefined;
+    
+    if (!admin) {
+      console.error('❌ Erro ao criar admin: usuário não encontrado após criação');
+      return;
+    }
     
     console.log('✅ Usuário admin criado automaticamente');
     console.log(`   Username: ${admin.username}`);
@@ -62,4 +64,3 @@ export async function createAdminUser() {
     }
   }
 }
-

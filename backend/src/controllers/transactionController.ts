@@ -153,7 +153,11 @@ export async function deleteTransaction(req: Request, res: Response) {
       return res.status(404).json({ error: 'Transação não encontrada' });
     }
 
-    const transaction = transactionResult.rows[0];
+    const transaction = transactionResult.rows[0] as { tipo: string; valor: number; account_id: string } | undefined;
+    
+    if (!transaction) {
+      return res.status(404).json({ error: 'Transação não encontrada' });
+    }
 
     // Reverter saldo
     const saldoUpdate = transaction.tipo === 'receita' ? -transaction.valor : transaction.valor;

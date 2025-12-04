@@ -29,11 +29,12 @@ export async function createDivisionRule(req: Request, res: Response) {
   try {
     // Verificar se é casal
     const userResult = await pool.query(
-      `SELECT tipo FROM users WHERE id = $1`,
+      `SELECT tipo FROM users WHERE id = ?`,
       [userId]
     );
 
-    if (userResult.rows[0]?.tipo !== 'casal') {
+    const user = userResult.rows[0] as { tipo: string } | undefined;
+    if (!user || user.tipo !== 'casal') {
       return res.status(400).json({ error: 'Regras de divisão são apenas para casais' });
     }
 
@@ -134,14 +135,14 @@ export async function calculateDivision(req: Request, res: Response) {
       });
     }
 
-    const rule = ruleResult.rows[0];
-    const parametros = typeof rule.parametros === 'string' 
+    const rule = ruleResult.rows[0] as any;
+    const parametros = typeof rule?.parametros === 'string' 
       ? JSON.parse(rule.parametros) 
-      : rule.parametros;
+      : rule?.parametros;
 
     let divisao: { usuarioA: number; usuarioB: number; total: number };
 
-    switch (rule.tipo) {
+    switch (rule?.tipo) {
       case 'equal':
         divisao = {
           usuarioA: valor / 2,

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import pool, { generateUUID } from '../config/database';
 import { hashPassword, comparePassword } from '../utils/password';
 import { generateToken } from '../utils/jwt';
+import { UserRow } from '../types/database';
 
 export async function register(req: Request, res: Response) {
   const { nome, username, password, estadoCivil, rendaMensal, contaConjunta, metaPrincipal, permitirIA } = req.body;
@@ -33,7 +34,7 @@ export async function register(req: Request, res: Response) {
 
     // Buscar usuário criado
     const userResult = await pool.query('SELECT id, nome, username, tipo, criado_em FROM users WHERE id = ?', [userId]);
-    const user = userResult.rows[0];
+    const user = userResult.rows[0] as UserRow;
 
     // Criar perfil
     const profileId = generateUUID();
@@ -121,7 +122,7 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ error: 'Username ou senha incorretos' });
     }
 
-    const user = userResult.rows[0];
+    const user = userResult.rows[0] as UserRow & { password_hash: string };
 
     // Verificar senha
     const passwordMatch = await comparePassword(password, user.password_hash);
@@ -173,7 +174,7 @@ export async function getProfile(req: Request, res: Response) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
 
-    res.json(userResult.rows[0]);
+    res.json(userResult.rows[0] as UserRow & { renda_mensal?: number; preferencia_divisao?: string });
   } catch (error) {
     console.error('Erro ao buscar perfil:', error);
     res.status(500).json({ error: 'Erro ao buscar perfil' });
