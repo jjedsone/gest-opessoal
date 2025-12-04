@@ -136,3 +136,26 @@
   text-decoration: underline;
 }
 
+.quick-login-button {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  color: #667eea;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.quick-login-button:hover:not(:disabled) {
+  background: #e8e8e8;
+  border-color: #667eea;
+}
+
+.quick-login-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

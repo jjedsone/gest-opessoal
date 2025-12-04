@@ -51,6 +51,14 @@ function LoginSimples() {
     }
   };
 
+  const handleQuickLogin = () => {
+    setFormData({
+      email: 'admin@finunity.com',
+      password: 'admin123',
+    });
+    setError(null);
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -137,6 +145,17 @@ function LoginSimples() {
             <button type="submit" className="submit-button" disabled={loading}>
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
+
+            <div style={{ textAlign: 'center', marginTop: '8px' }}>
+              <button
+                type="button"
+                onClick={handleQuickLogin}
+                className="quick-login-button"
+                disabled={loading}
+              >
+                🔐 Login Rápido (Admin)
+              </button>
+            </div>
 
             <div className="login-footer">
               <p>
