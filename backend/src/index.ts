@@ -78,6 +78,14 @@ async function startServer() {
     console.error('O servidor iniciará, mas as rotas que precisam do banco retornarão erro.\n');
   } else {
     await checkTablesExist();
+    
+    // Criar usuário admin automaticamente se não existir
+    try {
+      const { createAdminUser } = await import('./utils/createAdmin');
+      await createAdminUser();
+    } catch (error) {
+      // Ignorar erros ao criar admin
+    }
   }
 
   app.listen(PORT, () => {

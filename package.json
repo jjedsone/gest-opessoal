@@ -9,7 +9,8 @@
     "dev:frontend": "cd frontend && npm run dev",
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "install:backend": "cd backend && npm install",
-    "install:frontend": "cd frontend && npm install"
+    "install:frontend": "cd frontend && npm install",
+    "create-admin": "node scripts/criar-admin.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
