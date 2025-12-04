@@ -1,67 +1,80 @@
 import { Request, Response } from 'express';
-import pool from '../config/database';
+import pool, { generateUUID } from '../config/database';
 import { hashPassword, comparePassword } from '../utils/password';
 import { generateToken } from '../utils/jwt';
 
 export async function register(req: Request, res: Response) {
-  const { nome, email, password, estadoCivil, rendaMensal, contaConjunta, metaPrincipal, permitirIA } = req.body;
+  const { nome, username, password, estadoCivil, rendaMensal, contaConjunta, metaPrincipal, permitirIA } = req.body;
 
   try {
+    // Validar username
+    if (!username || username.trim().length < 3) {
+      return res.status(400).json({ error: 'Username deve ter pelo menos 3 caracteres' });
+    }
+
     // Verificar se usuário já existe
-    const userExists = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    const userExists = await pool.query('SELECT id FROM users WHERE username = ?', [username.trim()]);
     if (userExists.rows.length > 0) {
-      return res.status(400).json({ error: 'E-mail já cadastrado' });
+      return res.status(400).json({ error: 'Username já cadastrado' });
     }
 
     // Hash da senha
     const passwordHash = await hashPassword(password);
 
+    // Gerar ID único
+    const userId = generateUUID();
+
     // Criar usuário
-    const userResult = await pool.query(
-      `INSERT INTO users (nome, email, password_hash, tipo) 
-       VALUES ($1, $2, $3, $4) 
-       RETURNING id, nome, email, tipo, criado_em`,
-      [nome, email, passwordHash, estadoCivil === 'casado' ? 'casal' : 'solteiro']
+    await pool.query(
+      `INSERT INTO users (id, nome, username, password_hash, tipo) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, nome, username.trim(), passwordHash, estadoCivil === 'casado' ? 'casal' : 'solteiro']
     );
 
+    // Buscar usuário criado
+    const userResult = await pool.query('SELECT id, nome, username, tipo, criado_em FROM users WHERE id = ?', [userId]);
     const user = userResult.rows[0];
 
     // Criar perfil
+    const profileId = generateUUID();
     await pool.query(
-      `INSERT INTO profiles (user_id, renda_mensal, preferencia_divisao) 
-       VALUES ($1, $2, $3)`,
-      [user.id, rendaMensal || null, null]
+      `INSERT INTO profiles (id, user_id, renda_mensal, preferencia_divisao) 
+       VALUES (?, ?, ?, ?)`,
+      [profileId, user.id, rendaMensal || null, null]
     );
 
     // Criar conta padrão
+    const accountId = generateUUID();
     await pool.query(
-      `INSERT INTO accounts (user_id, nome, tipo, saldo) 
-       VALUES ($1, $2, $3, 0)`,
-      [user.id, 'Conta Principal', 'corrente']
+      `INSERT INTO accounts (id, user_id, nome, tipo, saldo) 
+       VALUES (?, ?, ?, ?, 0)`,
+      [accountId, user.id, 'Conta Principal', 'corrente']
     );
 
     // Se for casal e tiver conta conjunta, criar conta conjunta
     if (estadoCivil === 'casado' && contaConjunta) {
+      const jointAccountId = generateUUID();
       await pool.query(
-        `INSERT INTO accounts (user_id, nome, tipo, saldo) 
-         VALUES ($1, $2, $3, 0)`,
-        [user.id, 'Conta Conjunta', 'conjunta']
+        `INSERT INTO accounts (id, user_id, nome, tipo, saldo) 
+         VALUES (?, ?, ?, ?, 0)`,
+        [jointAccountId, user.id, 'Conta Conjunta', 'conjunta']
       );
     }
 
     // Criar meta se informada
     if (metaPrincipal) {
+      const goalId = generateUUID();
       await pool.query(
-        `INSERT INTO goals (user_id, titulo, valor_objetivo, valor_atual, prioridade) 
-         VALUES ($1, $2, 0, 0, 'media')`,
-        [user.id, metaPrincipal]
+        `INSERT INTO goals (id, user_id, titulo, valor_objetivo, valor_atual, prioridade) 
+         VALUES (?, ?, ?, 0, 0, 'media')`,
+        [goalId, user.id, metaPrincipal]
       );
     }
 
     // Gerar token
     const token = generateToken({
       userId: user.id,
-      email: user.email,
+      username: user.username,
     });
 
     res.status(201).json({
@@ -69,7 +82,7 @@ export async function register(req: Request, res: Response) {
       user: {
         id: user.id,
         nome: user.nome,
-        email: user.email,
+        username: user.username,
         tipo: user.tipo,
       },
       token,
@@ -78,24 +91,10 @@ export async function register(req: Request, res: Response) {
     console.error('Erro ao registrar usuário:', error);
     
     // Mensagens de erro mais específicas
-    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
-      return res.status(503).json({ 
-        error: 'Banco de dados não disponível',
-        message: 'Verifique se o PostgreSQL está rodando',
-        details: error.message 
-      });
-    }
-    
-    if (error.code === '42P01') {
-      return res.status(500).json({ 
-        error: 'Tabelas não encontradas',
-        message: 'Execute o schema SQL: psql -U postgres -d finunity -f database/schema.sql',
-        details: error.message 
-      });
-    }
-    
-    if (error.code === '23505') {
-      return res.status(400).json({ error: 'E-mail já cadastrado' });
+    if (error.code === 'SQLITE_CONSTRAINT') {
+      if (error.message.includes('UNIQUE')) {
+        return res.status(400).json({ error: 'Username já cadastrado' });
+      }
     }
     
     res.status(500).json({ 
@@ -107,19 +106,19 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    // Buscar usuário
+    // Buscar usuário por username
     const userResult = await pool.query(
-      `SELECT u.id, u.nome, u.email, u.password_hash, u.tipo 
+      `SELECT u.id, u.nome, u.username, u.password_hash, u.tipo 
        FROM users u 
-       WHERE u.email = $1`,
-      [email]
+       WHERE u.username = ?`,
+      [username]
     );
 
     if (userResult.rows.length === 0) {
-      return res.status(401).json({ error: 'E-mail ou senha incorretos' });
+      return res.status(401).json({ error: 'Username ou senha incorretos' });
     }
 
     const user = userResult.rows[0];
@@ -127,13 +126,13 @@ export async function login(req: Request, res: Response) {
     // Verificar senha
     const passwordMatch = await comparePassword(password, user.password_hash);
     if (!passwordMatch) {
-      return res.status(401).json({ error: 'E-mail ou senha incorretos' });
+      return res.status(401).json({ error: 'Username ou senha incorretos' });
     }
 
     // Gerar token
     const token = generateToken({
       userId: user.id,
-      email: user.email,
+      username: user.username,
     });
 
     res.json({
@@ -141,30 +140,13 @@ export async function login(req: Request, res: Response) {
       user: {
         id: user.id,
         nome: user.nome,
-        email: user.email,
+        username: user.username,
         tipo: user.tipo,
       },
       token,
     });
   } catch (error: any) {
     console.error('Erro ao fazer login:', error);
-    
-    // Mensagens de erro mais específicas
-    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
-      return res.status(503).json({ 
-        error: 'Banco de dados não disponível',
-        message: 'Verifique se o PostgreSQL está rodando',
-        details: error.message 
-      });
-    }
-    
-    if (error.code === '42P01') {
-      return res.status(500).json({ 
-        error: 'Tabelas não encontradas',
-        message: 'Execute o schema SQL: psql -U postgres -d finunity -f database/schema.sql',
-        details: error.message 
-      });
-    }
     
     res.status(500).json({ 
       error: 'Erro ao fazer login',
@@ -179,11 +161,11 @@ export async function getProfile(req: Request, res: Response) {
     const userId = req.user?.userId;
 
     const userResult = await pool.query(
-      `SELECT u.id, u.nome, u.email, u.tipo, u.criado_em, 
+      `SELECT u.id, u.nome, u.username, u.tipo, u.criado_em, 
               p.renda_mensal, p.preferencia_divisao
        FROM users u
        LEFT JOIN profiles p ON u.id = p.user_id
-       WHERE u.id = $1`,
+       WHERE u.id = ?`,
       [userId]
     );
 
@@ -197,4 +179,3 @@ export async function getProfile(req: Request, res: Response) {
     res.status(500).json({ error: 'Erro ao buscar perfil' });
   }
 }
-

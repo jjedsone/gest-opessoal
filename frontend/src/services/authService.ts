@@ -2,7 +2,7 @@ import api from './api';
 
 export interface RegisterData {
   nome: string;
-  email: string;
+  username: string;
   password: string;
   estadoCivil: 'solteiro' | 'casado';
   rendaMensal?: number;
@@ -12,14 +12,14 @@ export interface RegisterData {
 }
 
 export interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface User {
   id: string;
   nome: string;
-  email: string;
+  username: string;
   tipo: string;
 }
 

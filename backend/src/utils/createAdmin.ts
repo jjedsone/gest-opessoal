@@ -1,12 +1,15 @@
 import pool from '../config/database';
 import { hashPassword } from './password';
 
+import pool, { generateUUID } from '../config/database';
+import { hashPassword } from './password';
+
 export async function createAdminUser() {
   try {
     // Verificar se admin já existe
     const userExists = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      ['admin@finunity.com']
+      'SELECT id FROM users WHERE username = ?',
+      ['admin']
     );
 
     if (userExists.rows.length > 0) {
@@ -17,31 +20,38 @@ export async function createAdminUser() {
     // Hash da senha "admin123"
     const passwordHash = await hashPassword('admin123');
 
+    // Gerar ID único
+    const userId = generateUUID();
+
     // Criar usuário admin
-    const userResult = await pool.query(
-      `INSERT INTO users (nome, email, password_hash, tipo) 
-       VALUES ($1, $2, $3, $4) 
-       RETURNING id, nome, email`,
-      ['Administrador', 'admin@finunity.com', passwordHash, 'solteiro']
+    await pool.query(
+      `INSERT INTO users (id, nome, username, password_hash, tipo) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, 'Administrador', 'admin', passwordHash, 'solteiro']
     );
 
-    const admin = userResult.rows[0];
+    // Buscar admin criado
+    const adminResult = await pool.query('SELECT id, nome, username FROM users WHERE id = ?', [userId]);
+    const admin = adminResult.rows[0];
+    
     console.log('✅ Usuário admin criado automaticamente');
-    console.log(`   Email: ${admin.email}`);
+    console.log(`   Username: ${admin.username}`);
     console.log(`   Senha: admin123`);
 
     // Criar perfil
+    const profileId = generateUUID();
     await pool.query(
-      `INSERT INTO profiles (user_id, renda_mensal) 
-       VALUES ($1, $2)`,
-      [admin.id, 0]
+      `INSERT INTO profiles (id, user_id, renda_mensal) 
+       VALUES (?, ?, ?)`,
+      [profileId, admin.id, 0]
     );
 
     // Criar conta padrão
+    const accountId = generateUUID();
     await pool.query(
-      `INSERT INTO accounts (user_id, nome, tipo, saldo) 
-       VALUES ($1, $2, $3, 0)`,
-      [admin.id, 'Conta Principal', 'corrente']
+      `INSERT INTO accounts (id, user_id, nome, tipo, saldo) 
+       VALUES (?, ?, ?, ?, 0)`,
+      [accountId, admin.id, 'Conta Principal', 'corrente']
     );
 
     console.log('⚠️  IMPORTANTE: Altere a senha após o primeiro acesso!');

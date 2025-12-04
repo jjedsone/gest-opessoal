@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 interface TokenPayload {
   userId: string;
-  email: string;
+  username: string;
 }
 
 export function generateToken(payload: TokenPayload): string {

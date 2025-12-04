@@ -6,7 +6,7 @@ import './Login.css';
 function LoginSimples() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginData>({
-    email: '',
+    username: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ function LoginSimples() {
   const [showRegister, setShowRegister] = useState(false);
   const [registerData, setRegisterData] = useState({
     nome: '',
-    email: '',
+    username: '',
     password: '',
     confirmPassword: '',
   });
@@ -51,14 +51,6 @@ function LoginSimples() {
     }
   };
 
-  const handleQuickLogin = () => {
-    setFormData({
-      email: 'admin@finunity.com',
-      password: 'admin123',
-    });
-    setError(null);
-  };
-
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -77,10 +69,16 @@ function LoginSimples() {
       return;
     }
 
+    if (registerData.username.length < 3) {
+      setError('O username deve ter pelo menos 3 caracteres');
+      setLoading(false);
+      return;
+    }
+
     try {
       await authService.register({
         nome: registerData.nome,
-        email: registerData.email,
+        username: registerData.username,
         password: registerData.password,
         estadoCivil: 'solteiro',
         rendaMensal: 0,
@@ -96,6 +94,14 @@ function LoginSimples() {
     }
   };
 
+  const handleQuickLogin = () => {
+    setFormData({
+      username: 'admin',
+      password: 'admin123',
+    });
+    setError(null);
+  };
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -108,17 +114,18 @@ function LoginSimples() {
           // Formulário de Login
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-group">
-              <label htmlFor="email">E-mail</label>
+              <label htmlFor="username">Username</label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
                 onChange={handleLoginChange}
                 required
-                placeholder="seu@email.com"
-                autoComplete="email"
+                placeholder="seu_username"
+                autoComplete="username"
                 autoFocus
+                minLength={3}
               />
             </div>
 
@@ -191,16 +198,17 @@ function LoginSimples() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="register-email">E-mail</label>
+              <label htmlFor="register-username">Username</label>
               <input
-                type="email"
-                id="register-email"
-                name="email"
-                value={registerData.email}
+                type="text"
+                id="register-username"
+                name="username"
+                value={registerData.username}
                 onChange={handleRegisterChange}
                 required
-                placeholder="seu@email.com"
-                autoComplete="email"
+                placeholder="seu_username"
+                autoComplete="username"
+                minLength={3}
               />
             </div>
 
@@ -265,4 +273,3 @@ function LoginSimples() {
 }
 
 export default LoginSimples;
-
