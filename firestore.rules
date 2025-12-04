@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regra padrão: negar tudo por padrão (segurança máxima)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "frontend/dist",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -8,30 +8,20 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "function": "api"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(js|css|woff|woff2|ttf|eot)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000"
-          }
-        ]
-      },
-      {
-        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000"
-          }
-        ]
-      }
     ]
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
-
