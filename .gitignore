@@ -1,0 +1,128 @@
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Arquivos de ambiente (sensíveis - NUNCA commitar!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Build / Compilação
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Cache
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+.nyc_output/
+coverage/
+*.lcov
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Sistema Operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# Arquivos de teste
+coverage/
+.nyc_output/
+*.test.js.snap
+
+# Arquivos específicos do projeto
+# Backend
+backend/dist/
+backend/.env
+backend/.env.local
+backend/uploads/
+backend/temp/
+
+# Frontend
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.vite/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+database/dumps/
+database/backups/
+
+# Redis
+dump.rdb
+
+# Arquivos de migração temporários
+*.migration.js
+*.migration.ts
+
+# Arquivos de documentação gerados
+docs/_build/
+docs/.doctrees/
+
+# Arquivos de configuração local
+config.local.json
+config.local.js
+config.local.ts
+
+# Arquivos de certificados e chaves
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Arquivos de backup
+*.backup
+*.bak
+*.old
+
+# Arquivos de lock (opcional - alguns projetos preferem commitar)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
