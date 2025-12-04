@@ -1,6 +1,7 @@
-const bcrypt = require('bcryptjs');
-const { Pool } = require('pg');
-require('dotenv').config({ path: './backend/.env' });
+const path = require('path');
+const bcrypt = require(path.join(__dirname, '../backend/node_modules/bcryptjs'));
+const { Pool } = require(path.join(__dirname, '../backend/node_modules/pg'));
+require('dotenv').config({ path: path.join(__dirname, '../backend/.env') });
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
