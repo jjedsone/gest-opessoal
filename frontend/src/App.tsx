@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { authService } from './services/authService';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
+import LoginSimples from './pages/LoginSimples';
 import Dashboard from './pages/Dashboard';
 import Transacoes from './pages/Transacoes';
 import Metas from './pages/Metas';
@@ -21,8 +22,10 @@ function App() {
   return (
     <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <Routes>
-        <Route path="/" element={<Onboarding />} />
+        <Route path="/" element={<LoginSimples />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/login-simples" element={<LoginSimples />} />
         <Route 
           path="/dashboard" 
           element={

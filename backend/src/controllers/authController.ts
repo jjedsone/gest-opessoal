@@ -74,9 +74,35 @@ export async function register(req: Request, res: Response) {
       },
       token,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao registrar usuário:', error);
-    res.status(500).json({ error: 'Erro ao criar usuário' });
+    
+    // Mensagens de erro mais específicas
+    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+      return res.status(503).json({ 
+        error: 'Banco de dados não disponível',
+        message: 'Verifique se o PostgreSQL está rodando',
+        details: error.message 
+      });
+    }
+    
+    if (error.code === '42P01') {
+      return res.status(500).json({ 
+        error: 'Tabelas não encontradas',
+        message: 'Execute o schema SQL: psql -U postgres -d finunity -f database/schema.sql',
+        details: error.message 
+      });
+    }
+    
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'E-mail já cadastrado' });
+    }
+    
+    res.status(500).json({ 
+      error: 'Erro ao criar usuário',
+      message: error.message || 'Erro desconhecido',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }
 
@@ -120,9 +146,31 @@ export async function login(req: Request, res: Response) {
       },
       token,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao fazer login:', error);
-    res.status(500).json({ error: 'Erro ao fazer login' });
+    
+    // Mensagens de erro mais específicas
+    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+      return res.status(503).json({ 
+        error: 'Banco de dados não disponível',
+        message: 'Verifique se o PostgreSQL está rodando',
+        details: error.message 
+      });
+    }
+    
+    if (error.code === '42P01') {
+      return res.status(500).json({ 
+        error: 'Tabelas não encontradas',
+        message: 'Execute o schema SQL: psql -U postgres -d finunity -f database/schema.sql',
+        details: error.message 
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Erro ao fazer login',
+      message: error.message || 'Erro desconhecido',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }
 
