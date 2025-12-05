@@ -3,6 +3,7 @@ import { authService } from './services/authService';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import LoginSimples from './pages/LoginSimples';
+import StatusLogin from './pages/StatusLogin';
 import Dashboard from './pages/Dashboard';
 import Transacoes from './pages/Transacoes';
 import Metas from './pages/Metas';
@@ -23,6 +24,7 @@ function App() {
     <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <Routes>
         <Route path="/" element={<LoginSimples />} />
+        <Route path="/status" element={<StatusLogin />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
         <Route path="/login-simples" element={<LoginSimples />} />
