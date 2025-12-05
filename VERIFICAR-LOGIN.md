@@ -31,7 +31,7 @@ npm run dev
 - **Deve retornar**: `{"status":"ok","message":"FinUnity API está funcionando"}`
 
 ### Frontend
-- **URL**: http://localhost:5173 (ou outra porta indicada pelo Vite)
+- **URL**: http://localhost:3000 (porta configurada no Vite)
 - **Deve abrir**: Página de login do FinUnity
 
 ## 🧪 Testar Login
@@ -50,7 +50,7 @@ scripts\testar-login.bat
 
 ### Método 2: Teste Manual via Browser
 
-1. Abra o navegador em: http://localhost:5173
+1. Abra o navegador em: http://localhost:3000
 2. Você verá a página de login
 3. Use as credenciais:
    - **Username**: `admin`
@@ -140,14 +140,14 @@ Após iniciar o projeto, você deve ver:
 ```
   VITE v5.x.x  ready in xxx ms
 
-  ➜  Local:   http://localhost:5173/
+  ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
 ```
 
 ## ✅ Checklist de Verificação
 
 - [ ] Backend está rodando na porta 3001
-- [ ] Frontend está rodando na porta 5173
+- [ ] Frontend está rodando na porta 3000
 - [ ] Banco de dados SQLite foi criado (`database/finunity.db`)
 - [ ] Admin foi criado automaticamente (verificar logs)
 - [ ] Health check do backend responde OK

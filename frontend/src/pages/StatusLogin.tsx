@@ -34,8 +34,10 @@ function StatusLogin() {
 
   const checkBackend = async () => {
     try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      
       // Verificar health check básico
-      const healthResponse = await fetch('http://localhost:3001/health');
+      const healthResponse = await fetch(`${API_URL}/health`);
       const healthData = await healthResponse.json();
 
       setStatus(prev => ({
@@ -49,7 +51,7 @@ function StatusLogin() {
 
       // Verificar health check do banco
       try {
-        const dbHealthResponse = await fetch('http://localhost:3001/health/db');
+        const dbHealthResponse = await fetch(`${API_URL}/health/db`);
         const dbHealthData = await dbHealthResponse.json();
 
         setStatus(prev => ({
